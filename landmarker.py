@@ -4,6 +4,7 @@ import mediapipe as mp
 # 미디어파이프 pose 모델을 가져와 실행
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose()
+mp_drawing = mp.solutions.drawing_utils
 
 # 기본 카메라 (웹캠)에서 영상을 캡쳐하기 시작
 cap = cv2.VideoCapture(0)
@@ -23,7 +24,6 @@ while cap.isOpened():
 
     # 포즈가 있으면 랜드마크 그림
     if results.pose_landmarks:
-        mp_drawing = mp.solutions.drawing_utils
         mp_drawing.draw_landmarks(
             frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS
         )

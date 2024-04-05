@@ -41,7 +41,7 @@ def process_image(file_path):
         # 라벨을 붙여서 JSON 형식으로 변환
         landmarks = [
             (i, {"x": lm.x, "y": lm.y, "z": lm.z, "visibility": lm.visibility})
-            for i, lm in enumerate(results.pose_landmarks.landmark)
+            for i, lm in enumerate(results.pose_world_landmarks.landmark)
         ]
         landmarks_dict = {f"landmark_{i}": lm_data for i, lm_data in landmarks}
         landmarks_json = json.dumps(landmarks_dict, indent=4)

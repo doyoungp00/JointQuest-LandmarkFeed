@@ -1,7 +1,14 @@
+from pose_compare import compare_poses
 import cv2
 import mediapipe as mp
 import json
-import tkinter as tk
+
+# 정답 자세 JSON 로딩
+with open("output/exercise_world.json", "r") as file:
+    correct_pose = json.load(file)
+
+# 채점할 관절 넘버 리스트
+check_nodes = ["23", "25", "27"]  # 왼쪽 골반, 무릎, 발목
 
 # 미디어파이프 pose 모델을 가져와 실행
 mp_pose = mp.solutions.pose
@@ -10,15 +17,6 @@ mp_drawing = mp.solutions.drawing_utils
 
 # 기본 카메라 (웹캠)에서 영상을 캡쳐하기 시작
 cap = cv2.VideoCapture(0)
-
-# JSON 창 생성
-root = tk.Tk()
-root.title("Landmark JSON")
-json_text = tk.Text(root, height=20, width=40)
-json_text.pack(fill=tk.BOTH, expand=True)
-
-# JSON 창의 자동 크기 조절 금지
-root.pack_propagate(False)
 
 # 웹캠에서 넘어오는 각 프레임을 분석
 while cap.isOpened():
@@ -45,17 +43,13 @@ while cap.isOpened():
             for i, lm in enumerate(results.pose_world_landmarks.landmark)
         ]
         landmarks_dict = {f"landmark_{i}": lm_data for i, lm_data in landmarks}
-        landmarks_json = json.dumps(landmarks_dict, indent=4)
-
-        # 텍스트 상자 업데이트
-        json_text.delete("1.0", tk.END)  # Clear previous text
-        json_text.insert(tk.END, landmarks_json)
 
     # 결과 프레임 출력
     cv2.imshow("Mediapipe Pose Detection", frame)
 
-    # 루프마다 tkinter 창 업데이트
-    root.update()
+    # 채점 수행
+    passed = compare_poses(correct_pose, landmarks_dict, 0.1, 2, *check_nodes)
+    print(passed)
 
     # Q를 누르면 종료
     if cv2.waitKey(1) & 0xFF == ord("q"):
@@ -64,4 +58,3 @@ while cap.isOpened():
 # 리소스 정리
 cap.release()
 cv2.destroyAllWindows()
-root.mainloop()

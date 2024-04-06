@@ -1,11 +1,16 @@
 # 두 포즈를 비교해서 노드들이 비슷한 위치에 있는지 검사
-def compare_poses(ref_pose, comp_pose, margin, pass_threshold, *nodes):
+def compare_poses(
+    ref_pose: dict, comp_pose: dict, margin: float, pass_threshold: int, *nodes: list
+) -> dict:
     """
     파라미터:
     ref_pose, comp_pose (dict): 기준 포즈와 비교 포즈의 딕셔너리 객체
     margin (float): 각 노드를 중심으로 얼마나 큰 인식 영역을 둘지 지정
     pass_threshold (int): 몇 개의 노드가 영역 내에 들어와야 성공으로 판별할지 지정
     nodes (list): 비교를 수행할 노드의 리스트
+
+    리턴값:
+    pass_threshold 중 몇 개의 노드가 통과하였고, 몇 번 노드가 통과했는지 딕셔너리로 반환
     """
 
     def is_within_margin(ref_pos, comp_pos, margin):
@@ -23,6 +28,7 @@ def compare_poses(ref_pose, comp_pose, margin, pass_threshold, *nodes):
 
     # 리스트의 각 노드에 대해 비교 수행
     count = 0
+    passed_nodes = []  # 통과한 노드 리스트
     for node in nodes:
         # 기준 노드와 비교 노드의 위치 가져오기
         ref_x, ref_y = get_node_position(ref_pose, node)
@@ -33,9 +39,15 @@ def compare_poses(ref_pose, comp_pose, margin, pass_threshold, *nodes):
             ref_y, comp_y, margin
         ):
             count += 1
+            passed_nodes.append(node)
 
-    # pass_threshold보다 적을 경우 False
-    return count >= pass_threshold
+    # pass_threshold에 비교해 통과한 노드 수와 그의 리스트, 그리고 통과 여부 리턴
+    return {
+        "passed": count >= pass_threshold,
+        "threshold": pass_threshold,
+        "count": count,
+        "passed_nodes": passed_nodes,
+    }
 
 
 # 예시 데이터 (딕셔너리 형태)

@@ -10,6 +10,9 @@ with open("output/exercise_world.json", "r") as file:
 # 채점할 관절 넘버 리스트
 check_nodes = ["23", "25", "27"]  # 왼쪽 골반, 무릎, 발목
 
+# 채점 마진 (10cm)
+margin = 0.1
+
 # 미디어파이프 pose 모델을 가져와 실행
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose()
@@ -48,7 +51,7 @@ while cap.isOpened():
     cv2.imshow("Mediapipe Pose Detection", frame)
 
     # 채점 수행
-    passed = compare_poses(correct_pose, landmarks_dict, 0.1, 2, *check_nodes)
+    passed = compare_poses(correct_pose, landmarks_dict, margin, 2, *check_nodes)
     print(passed)
 
     # Q를 누르면 종료
